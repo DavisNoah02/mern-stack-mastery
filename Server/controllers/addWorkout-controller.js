@@ -1,6 +1,8 @@
 const Workout = require('../models/Workoutmodel');
+const mongoose = require('mongoose');
 
 // GET /api/workouts
+
 // get all workouts
 const getAllWorkouts = async (req, res) => {
   try {
@@ -16,6 +18,9 @@ const getAllWorkouts = async (req, res) => {
 // get a single workout
 const getSingleWorkout = async (req, res) => {
   const { id } = req.params;
+  if(!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(404).json({ error: 'No such workout' }); 
+  }
 
   try {
     const workout = await Workout.findById(id); // Find workout by ID
@@ -40,14 +45,12 @@ const updateWorkout = async (req, res) => {
       { title, load, reps }, // Update fields
       { new: true, runValidators: true } // Return the updated document and validate
     );
-
     if (!workout) {
       return res.status(404).json({ error: 'Workout not found' }); // Handle not found
     }
-
-    res.status(200).json(workout); // Return the updated workout
+    res.status(200).json(workout); 
   } catch (error) {
-    res.status(400).json({ error: error.message }); // Handle errors
+    res.status(400).json({ error: error.message }); 
   }
 };
 
@@ -74,7 +77,7 @@ const createWorkout = async (req,res) => {
       try {
         const workout = await Workout.create( {title, load, reps}); // create a new workout instance
       
-        res.status(200).json(workout); // return the newly created workout
+        res.status(200).json(workout); 
       } catch (error) {
         res.status(400).json({error: error.message}); 
       }
